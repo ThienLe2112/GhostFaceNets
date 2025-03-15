@@ -60,9 +60,9 @@ class My_history(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
         logs.pop("lr", None)
-        lr = self.model.optimizer.lr
+        lr = self.model.optimizer.learning_rate
         if hasattr(lr, "value"):
-            lr = lr.value()
+            lr = lr
 
         self.history.setdefault("lr", []).append(float(lr))
         for k, v in logs.items():
@@ -121,9 +121,10 @@ class OptimizerWeightDecay(keras.callbacks.Callback):
 
     def __update_wd__(self, step, log=None):
         if self.model is not None:
-            wd = self.wd_m * K.get_value(self.model.optimizer.lr)
+            wd = self.wd_m * K.get_value(self.model.optimizer.learning_rate)
             # wd = self.wd_base * K.get_value(self.model.optimizer.lr)
-            K.set_value(self.model.optimizer.weight_decay, wd)
+            #K.set_value(self.model.optimizer.weight_decay, wd)
+            self.model.optimizer.weight_decay = wd
         # wd = self.model.optimizer.weight_decay
         if not self.is_lr_on_batch or step == 0:
             print("Weight decay is {}".format(wd))
@@ -161,7 +162,8 @@ class CosineLrSchedulerEpoch(keras.callbacks.Callback):
             lr = self.schedule(epoch)
 
         if self.model is not None:
-            K.set_value(self.model.optimizer.lr, lr)
+            #K.set_value(self.model.optimizer.lr, lr)
+            self.model.optimizer.learning_rate = lr
 
         print("\nLearning rate for iter {} is {}".format(epoch + 1, lr))
         return lr
