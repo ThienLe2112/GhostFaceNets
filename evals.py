@@ -130,7 +130,8 @@ class eval_callback(tf.keras.callbacks.Callback):
                 save_path_base = os.path.join("checkpoints", save_name_base)
                 # for ii in glob2.glob(save_path_base + "*.h5"):
                     # os.remove(ii)
-                save_path = save_path_base + "%s_%f.h5" % (cur_step, self.max_accuracy)
+                save_path = save_path_base + "%s_%f.keras" % (cur_step, self.max_accuracy)
+                # save_path = save_path_base + "%s_%f.h5" % (cur_step, self.max_accuracy)
                 tf.print("Saving model to: %s" % (save_path))
                 self.basic_model.save(save_path, include_optimizer=False)
 
