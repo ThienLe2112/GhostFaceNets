@@ -65,7 +65,7 @@ class Train:
 
         #If model passed is string
         if isinstance(model, str):
-            if model.endswith(".h5") and os.path.exists(model):
+            if model.endswith(".keras") and os.path.exists(model):
                 print(">>>> Load model from h5 file: %s..." % model)
                 with keras.utils.custom_object_scope(custom_objects):
                     self.model = keras.models.load_model(model, compile=compile, custom_objects=custom_objects)
@@ -83,7 +83,7 @@ class Train:
         
         #If basic model is string
         elif isinstance(basic_model, str):
-            if basic_model.endswith(".h5") and os.path.exists(basic_model):
+            if basic_model.endswith(".keras") and os.path.exists(basic_model):
                 print(">>>> Load basic_model from h5 file: %s..." % basic_model)
                 with keras.utils.custom_object_scope(custom_objects):
                     self.basic_model = keras.models.load_model(basic_model, compile=compile, custom_objects=custom_objects)
@@ -98,8 +98,8 @@ class Train:
                 "| basic_model                                                     | model           |\n"
                 "| --------------------------------------------------------------- | --------------- |\n"
                 "| model structure                                                 | None            |\n"
-                "| basic model .h5 file                                            | None            |\n"
-                "| None for 'embedding' layer or layer index of basic model output | model .h5 file  |\n"
+                "| basic model .keras file                                            | None            |\n"
+                "| None for 'embedding' layer or layer index of basic model output | model .keras file  |\n"
                 "| None for 'embedding' layer or layer index of basic model output | model structure |\n"
                 "| None                                                            | None            |\n"
                 "* Both None for reload model from 'checkpoints/{}'\n".format(save_path)
@@ -227,7 +227,7 @@ class Train:
     def __init_optimizer__(self, optimizer):
         if optimizer == None:
             if self.model != None and self.model.optimizer != None:
-                # Model loaded from .h5 file already compiled
+                # Model loaded from .keras file already compiled
                 # Saving may meet Error: OSError: Unable to create link (name already exists)
                 self.optimizer = self.model.optimizer
                 compiled_opt = self.optimizer.inner_optimizer if isinstance(self.optimizer, keras.mixed_precision.LossScaleOptimizer) else self.optimizer
@@ -486,7 +486,7 @@ class Train:
         # self.callbacks.append(keras.callbacks.TerminateOnNaN())
         self.callbacks.append(myCallbacks.ExitOnNaN())  # Exit directly avoiding further saving
         # self.callbacks.append(keras.callbacks.LambdaCallback(on_epoch_end=lambda epoch, logs=None: keras.backend.clear_session()))
-        # self.callbacks.append(keras.callbacks.LambdaCallback(on_epoch_end=lambda epoch, logs=None: self.basic_model.save("aa_epoch{}.h5".format(epoch))))
+        # self.callbacks.append(keras.callbacks.LambdaCallback(on_epoch_end=lambda epoch, logs=None: self.basic_model.save("aa_epoch{}.keras".format(epoch))))
 
         if self.vpl_start_iters > 0:  # VPL mode, needs the actual batch_size
             loss.build(self.batch_size_per_replica)
@@ -507,7 +507,7 @@ class Train:
         print(">>>> Train %s DONE!!! epochs = %s, model.stop_training = %s" % (type, self.model.history.epoch, self.model.stop_training))
         print(">>>> My history:")
         self.my_history.print_hist()
-        latest_save_path = os.path.join("checkpoints", os.path.splitext(self.save_path)[0] + "_basic_model_latest.h5")
+        latest_save_path = os.path.join("checkpoints", os.path.splitext(self.save_path)[0] + "_basic_model_latest.keras")
         print(">>>> Saving latest basic model to:", latest_save_path)
         self.basic_model.save(latest_save_path)
 
